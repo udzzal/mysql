@@ -1,0 +1,68 @@
+
+Branch (BranchName, BranchCity, Assets)
+Customer (CustomerID,CustomerName,CustomerStreet, CustomerCity)
+SavingAccount (AccountNumber, BranchName, Balance)
+Loan (LoanNumber, BranchName, Amount)
+Depositor (CustomerID, AccountNumber)
+Borrower (CustomerID, LoanNumber)
+
+// solutions 
+1 :
+DELETE FROM Loan
+WHERE Amount BETWEEN 5000 AND 15000;
+
+2:
+SELECT BranchName
+FROM Branch
+WHERE BranchName NOT IN (SELECT BranchName FROM SavingAccount);
+3:
+SELECT BranchName, SUM(Amount) AS TotalLoan
+FROM Loan
+GROUP BY BranchName
+HAVING SUM(Amount) > 50000;
+4:
+UPDATE SavingAccount
+SET Balance = CASE
+    WHEN AccountNumber IN (
+        SELECT D.AccountNumber
+        FROM Depositor D
+        JOIN Borrower B ON D.CustomerID = B.CustomerID
+    )
+    THEN Balance * 0.97   -- deduct 3%
+    ELSE Balance * 0.95   -- deduct 5%
+END;
+// problem 
+1. Consider the Bank database, which consists of the following tables where the
+primary keys are underlined.
+Branch (BranchName, BranchCity, Assets)
+Customer (CustomerID,CustomerName,CustomerStreet, CustomerCity)
+Account (AccountNumber, BranchName, Balance)
+Loan (LoanNumber, BranchName, Amount)
+Depositor (CustomerID, AccountNumber)
+Borrower (CustomerID, LoanNumber)
+Write SQL queries for the following requirements.
+1. Retrieve distinct customers who have either an account or a loan.
+II. Retrieve the branch with the maximum number of accounts.
+III. Find the maximum loan amount issued in cach branch.
+IV. Find customers whose names start with 'A'.
+
+// solutions 
+1 :
+SELECT DISTINCT C.CustomerID, C.CustomerName
+FROM Customer C
+WHERE C.CustomerID IN (SELECT CustomerID FROM Depositor)
+   OR C.CustomerID IN (SELECT CustomerID FROM Borrower);
+2:
+SELECT BranchName
+FROM Account
+GROUP BY BranchName
+ORDER BY COUNT(AccountNumber) DESC
+LIMIT 1;
+3:
+SELECT BranchName, MAX(Amount) AS MaxLoan
+FROM Loan
+GROUP BY BranchName;
+4:
+SELECT CustomerID, CustomerName
+FROM Customer
+WHERE CustomerName LIKE 'A%';
