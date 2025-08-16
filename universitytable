@@ -1,0 +1,36 @@
+Student (StudentID, StudentName, DOB, Gender, Address, Phone, Email, DepartmentID)
+Department (DepartmentID, DepartmentName, HeadOfDept, FacultyCount)
+Course (CourseID, CourseName, Credits, DepartmentID)
+Faculty (FacultyID, FacultyMemberName, Designation, Email, Phone, DepartmentID)
+Enrollment (EnrollmentID, StudentID, CourselD, Semester, Grade)
+Classroom (RoomNumber, Building, Capacity)
+
+
+Write SQL queries for the following requirements.
+I. Find the department with the highest number of students.
+II. Retrieve students who have taken more than 3 courses.
+III. Find students who have taken at least one course and got an 'F'..
+JV. Find the total number of students enrolled in each course.
+
+1
+SELECT DepartmentID, COUNT(StudentID) AS StudentCount
+FROM Student
+GROUP BY DepartmentID
+ORDER BY StudentCount DESC
+LIMIT 1;
+2:
+SELECT S.StudentID, S.StudentName, COUNT(E.CourseID) AS CourseCount
+FROM Student S
+JOIN Enrollment E ON S.StudentID = E.StudentID
+GROUP BY S.StudentID, S.StudentName
+HAVING COUNT(E.CourseID) > 3;
+3:
+SELECT DISTINCT S.StudentID, S.StudentName
+FROM Student S
+JOIN Enrollment E ON S.StudentID = E.StudentID
+WHERE E.Grade = 'F';
+4:
+SELECT C.CourseID, C.CourseName, COUNT(E.StudentID) AS TotalStudents
+FROM Course C
+LEFT JOIN Enrollment E ON C.CourseID = E.CourseID
+GROUP BY C.CourseID, C.CourseName;
